@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Text?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.messenger.controller.MainController" styleClass="root">
+    
+    <stylesheets>
+        <URL value="@../css/style.css" />
+    </stylesheets>
+
+    <!-- Barre supérieure MyChat -->
+    <HBox styleClass="top-bar" alignment="CENTER_LEFT">
+        <HBox styleClass="window-controls">
+            <Circle radius="6" styleClass="dot-red"/>
+            <Circle radius="6" styleClass="dot-green"/>
+            <Circle radius="6" styleClass="dot-green"/>
+        </HBox>
+        <HBox styleClass="top-bar-logo-container">
+            <Label text="💬" styleClass="top-bar-logo-text"/>
+            <Label text="MyChat" styleClass="top-bar-logo-text"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Déconnexion" styleClass="top-bar-button" onAction="#handleLogout"/>
+    </HBox>
+
+    <HBox VBox.vgrow="ALWAYS">
+        <!-- Sidebar -->
+        <VBox prefWidth="300" styleClass="sidebar">
+            <HBox styleClass="sidebar-header" alignment="CENTER_LEFT" spacing="10">
+                <Label text="Utilisateurs" styleClass="sidebar-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="⚙" styleClass="icon-btn" onAction="#showSettings"/>
+                <Button text="+" styleClass="add-button" onAction="#newConversation"/>
+            </HBox>
+            
+            <!-- Barre de Recherche -->
+            <VBox styleClass="search-container">
+                <HBox styleClass="search-box" alignment="CENTER_LEFT">
+                    <Label text="🔍" styleClass="search-icon"/>
+                    <TextField fx:id="searchField" promptText="Rechercher un contact..." 
+                              styleClass="search-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+            
+            <ListView fx:id="conversationsList" VBox.vgrow="ALWAYS" styleClass="conversations-list">
+            </ListView>
+        </VBox>
+        
+        <!-- Zone de chat -->
+        <VBox HBox.hgrow="ALWAYS" styleClass="chat-area">
+            <!-- Header chat -->
+            <HBox fx:id="chatHeader" styleClass="chat-header" spacing="15">
+                <StackPane fx:id="profileClickArea" onMouseClicked="#changeProfilePicture">
+                    <Circle fx:id="activeChatPic" radius="24" styleClass="profile-pic"/>
+                    <Circle radius="6" styleClass="online-status" StackPane.alignment="BOTTOM_RIGHT"/>
+                </StackPane>
+                <VBox spacing="2" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                    <Label fx:id="contactName" text="Sélectionnez un utilisateur" styleClass="chat-header-name"/>
+                    <Label fx:id="contactStatus" text="" styleClass="chat-header-status"/>
+                </VBox>
+                <HBox spacing="15" alignment="CENTER_RIGHT">
+                    <Button text="📞" styleClass="icon-btn" onAction="#voiceCall"/>
+                    <Button text="📹" styleClass="icon-btn" onAction="#videoCall"/>
+                </HBox>
+            </HBox>
+            
+            <!-- Messages -->
+            <ScrollPane fx:id="messagesScrollPane" VBox.vgrow="ALWAYS" styleClass="messages-scroll" 
+                       fitToWidth="true" hbarPolicy="NEVER">
+                <VBox fx:id="messagesContainer" styleClass="messages-container">
+                </VBox>
+            </ScrollPane>
+            
+            <!-- Saisie -->
+            <HBox styleClass="input-area" spacing="15">
+                <HBox styleClass="message-input-container" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                    <TextField fx:id="messageInput" promptText="Tapez votre message..." 
+                              styleClass="message-input" HBox.hgrow="ALWAYS" 
+                              onAction="#sendMessage"/>
+                    <Button text="📎" styleClass="icon-btn" onAction="#attachFile"/>
+                </HBox>
+                <Button fx:id="sendButton" text="Envoyer" styleClass="send-btn" onAction="#sendMessage"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

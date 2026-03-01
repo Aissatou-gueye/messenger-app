@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+
+<?import java.net.URL?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+           fx:controller="com.messenger.controller.LoginController" styleClass="auth-root">
+    
+    <stylesheets>
+        <URL value="@../css/style.css" />
+    </stylesheets>
+    
+    <!-- Conteneur Glassmorphism -->
+    <VBox alignment="CENTER" maxWidth="520" maxHeight="620" styleClass="glass-pane" spacing="35">
+        
+        <!-- Logo MyChat -->
+        <HBox styleClass="auth-logo-container">
+            <Label text="💬" styleClass="auth-logo-text" style="-fx-text-fill: rgba(255,255,255,0.9);"/>
+            <Label text="MyChat" styleClass="auth-logo-text"/>
+        </HBox>
+        
+        <!-- Carte Blanche Interne -->
+        <VBox alignment="CENTER" styleClass="auth-card" spacing="25" maxWidth="380">
+            
+            <StackPane>
+                <Circle radius="42" styleClass="auth-icon-circle"/>
+                <Label text="👤" style="-fx-font-size: 45px; -fx-text-fill: white;"/>
+            </StackPane>
+            
+            <VBox alignment="CENTER" spacing="8">
+                <Label text="Bienvenue" styleClass="auth-welcome"/>
+                <Label text="Connectez-vous pour continuer" styleClass="auth-instructions"/>
+            </VBox>
+            
+            <!-- Formulaire -->
+            <VBox spacing="15" maxWidth="320">
+                <HBox styleClass="auth-input-group">
+                    <Label text="👤" styleClass="auth-input-icon"/>
+                    <TextField fx:id="usernameField" promptText="Nom d'utilisateur" styleClass="auth-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+                
+                <HBox styleClass="auth-input-group">
+                    <Label text="🔒" styleClass="auth-input-icon"/>
+                    <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="auth-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+            
+            <Button text="Se connecter" styleClass="auth-btn-submit" onAction="#handleLogin" maxWidth="320" prefHeight="48"/>
+            
+            <HBox alignment="CENTER" spacing="8">
+                <Label text="Pas encore de compte ?" styleClass="auth-footer-text"/>
+                <Hyperlink text="S'inscrire" styleClass="auth-footer-link" onAction="#goToRegister"/>
+            </HBox>
+        </VBox>
+        
+    </VBox>
+</StackPane>
