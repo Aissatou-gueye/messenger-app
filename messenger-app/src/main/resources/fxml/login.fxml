@@ -46,7 +46,11 @@
                 
                 <HBox styleClass="auth-input-group">
                     <Label text="🔒" styleClass="auth-input-icon"/>
-                    <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="auth-input-field" HBox.hgrow="ALWAYS"/>
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="auth-input-field"/>
+                        <TextField fx:id="passwordTextField" promptText="Mot de passe" styleClass="auth-input-field" visible="false"/>
+                        <Button text="👁" styleClass="password-toggle-btn" StackPane.alignment="CENTER_RIGHT" onAction="#togglePasswordVisible"/>
+                    </StackPane>
                 </HBox>
             </VBox>
             

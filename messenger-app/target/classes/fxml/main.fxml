@@ -1,91 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Text?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.messenger.controller.MainController" styleClass="root">
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.messenger.controller.MainController">
     
     <stylesheets>
         <URL value="@../css/style.css" />
     </stylesheets>
 
     <!-- Barre supérieure MyChat -->
-    <HBox styleClass="top-bar" alignment="CENTER_LEFT">
-        <HBox styleClass="window-controls">
-            <Circle radius="6" styleClass="dot-red"/>
-            <Circle radius="6" styleClass="dot-green"/>
-            <Circle radius="6" styleClass="dot-green"/>
+    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="top-bar">
+        <padding>
+            <Insets left="20" right="20" />
+        </padding>
+        <HBox spacing="8" styleClass="window-controls">
+            <Circle radius="10.0" styleClass="dot-red" />
+            <Circle radius="9.0" styleClass="dot-orange" />
+            <Circle radius="10.0" styleClass="dot-green" />
         </HBox>
-        <HBox styleClass="top-bar-logo-container">
-            <Label text="💬" styleClass="top-bar-logo-text"/>
-            <Label text="MyChat" styleClass="top-bar-logo-text"/>
+        <HBox spacing="8" styleClass="top-bar-logo-container">
+            <Label prefHeight="35.0" prefWidth="18.0" styleClass="top-bar-logo-text-icon" text="💬" />
+            <Label prefHeight="31.0" prefWidth="59.0" styleClass="top-bar-logo-text" text="MyChat" />
         </HBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Déconnexion" styleClass="top-bar-button" onAction="#handleLogout"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <Hyperlink onAction="#handleLogout" styleClass="top-bar-logout-link" text="Déconnexion" />
     </HBox>
 
     <HBox VBox.vgrow="ALWAYS">
-        <!-- Sidebar -->
-        <VBox prefWidth="300" styleClass="sidebar">
-            <HBox styleClass="sidebar-header" alignment="CENTER_LEFT" spacing="10">
-                <Label text="Utilisateurs" styleClass="sidebar-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="⚙" styleClass="icon-btn" onAction="#showSettings"/>
-                <Button text="+" styleClass="add-button" onAction="#newConversation"/>
-            </HBox>
-            
-            <!-- Barre de Recherche -->
-            <VBox styleClass="search-container">
-                <HBox styleClass="search-box" alignment="CENTER_LEFT">
-                    <Label text="🔍" styleClass="search-icon"/>
-                    <TextField fx:id="searchField" promptText="Rechercher un contact..." 
-                              styleClass="search-field" HBox.hgrow="ALWAYS"/>
+        <!-- COLONNE 1 : SIDEBAR -->
+        <VBox minWidth="320" prefWidth="320" styleClass="sidebar">
+            <!-- Header Profil -->
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="sidebar-header">
+            <StackPane onMouseClicked="#changeProfilePicture" styleClass="clickable-avatar">
+                <Circle fx:id="myProfilePicCircle" radius="22" styleClass="my-profile-pic" />
+                <Label styleClass="my-profile-icon" text="👤" />
+                <Circle mouseTransparent="true" radius="6" styleClass="online-status" StackPane.alignment="BOTTOM_RIGHT">
+                    <StackPane.margin><Insets bottom="2" right="2" /></StackPane.margin>
+                </Circle>
+            </StackPane>
+            <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label styleClass="sidebar-title" text="Mon Profil" />
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <Circle radius="4" styleClass="online-status-small" />
+                    <Label styleClass="status-text" text="En ligne" />
                 </HBox>
             </VBox>
+            <Button onAction="#showSettings" styleClass="icon-btn-small" text="⚙" />
+            <Button onAction="#newConversation" styleClass="icon-btn-small" text="➕" />
+            <Button onAction="#createGroup" styleClass="icon-btn-small" text="👥+" />
+        </HBox>
+        
+        <!-- Barre de Recherche -->
+        <VBox spacing="10" styleClass="search-container">
+            <HBox alignment="CENTER_LEFT" styleClass="search-box">
+                <Label styleClass="search-icon" text="🔍" />
+                <TextField fx:id="searchField" promptText="Rechercher une conversation..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+            </HBox>
             
-            <ListView fx:id="conversationsList" VBox.vgrow="ALWAYS" styleClass="conversations-list">
-            </ListView>
+            <!-- Tags (Tous, Non lus, Groupes) -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button maxWidth="Infinity" onAction="#filterAll" styleClass="filter-btn, filter-btn-active" text="Tous" HBox.hgrow="ALWAYS" />
+                <Button maxWidth="Infinity" onAction="#filterUnread" styleClass="filter-btn" text="Non lus" HBox.hgrow="ALWAYS" />
+                <Button maxWidth="Infinity" onAction="#filterGroups" styleClass="filter-btn" text="Groupes" HBox.hgrow="ALWAYS" />
+            </HBox>
         </VBox>
         
-        <!-- Zone de chat -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="chat-area">
-            <!-- Header chat -->
-            <HBox fx:id="chatHeader" styleClass="chat-header" spacing="15">
-                <StackPane fx:id="profileClickArea" onMouseClicked="#changeProfilePicture">
-                    <Circle fx:id="activeChatPic" radius="24" styleClass="profile-pic"/>
-                    <Circle radius="6" styleClass="online-status" StackPane.alignment="BOTTOM_RIGHT"/>
-                </StackPane>
-                <VBox spacing="2" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
-                    <Label fx:id="contactName" text="Sélectionnez un utilisateur" styleClass="chat-header-name"/>
-                    <Label fx:id="contactStatus" text="" styleClass="chat-header-status"/>
-                </VBox>
-                <HBox spacing="15" alignment="CENTER_RIGHT">
-                    <Button text="📞" styleClass="icon-btn" onAction="#voiceCall"/>
-                    <Button text="📹" styleClass="icon-btn" onAction="#videoCall"/>
+        <Label styleClass="section-title" text="DISCUSSIONS" />
+        <ListView fx:id="conversationsList" styleClass="conversations-list" VBox.vgrow="ALWAYS" />
+    </VBox>
+    
+    <!-- COLONNE 2 : CHAT -->
+    <VBox styleClass="chat-area" HBox.hgrow="ALWAYS">
+        <!-- Header chat -->
+        <HBox fx:id="chatHeader" spacing="15" styleClass="chat-header">
+            <StackPane fx:id="profileClickArea" onMouseClicked="#changeProfilePicture" styleClass="clickable-avatar">
+                <Circle fx:id="activeChatPic" radius="24" styleClass="profile-pic" />
+                <Circle radius="6" styleClass="online-status" StackPane.alignment="BOTTOM_RIGHT">
+                    <StackPane.margin><Insets bottom="2" right="2" /></StackPane.margin>
+                </Circle>
+            </StackPane>
+            <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+                <Label fx:id="contactName" styleClass="chat-header-name" text="Sélectionnez un utilisateur" />
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <Circle radius="4" styleClass="online-status-small" />
+                    <Label fx:id="contactStatus" styleClass="chat-header-status" text="En ligne - dernière vue à l'instant" />
                 </HBox>
+            </VBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15">
+                <Button styleClass="icon-btn-active" text="💬" />
+                <Button onAction="#voiceCall" styleClass="icon-btn-top" text="📞" />
+                <Button onAction="#videoCall" styleClass="icon-btn-top" text="📹" />
+                <Button onAction="#toggleContactInfo" styleClass="icon-btn-top" text="⋮" />
             </HBox>
-            
+        </HBox>
+        
+        <HBox VBox.vgrow="ALWAYS">
             <!-- Messages -->
-            <ScrollPane fx:id="messagesScrollPane" VBox.vgrow="ALWAYS" styleClass="messages-scroll" 
-                       fitToWidth="true" hbarPolicy="NEVER">
-                <VBox fx:id="messagesContainer" styleClass="messages-container">
-                </VBox>
-            </ScrollPane>
-            
-            <!-- Saisie -->
-            <HBox styleClass="input-area" spacing="15">
-                <HBox styleClass="message-input-container" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
-                    <TextField fx:id="messageInput" promptText="Tapez votre message..." 
-                              styleClass="message-input" HBox.hgrow="ALWAYS" 
-                              onAction="#sendMessage"/>
-                    <Button text="📎" styleClass="icon-btn" onAction="#attachFile"/>
+            <VBox styleClass="messages-panel" HBox.hgrow="ALWAYS">
+                <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="messages-scroll" VBox.vgrow="ALWAYS">
+                    <VBox fx:id="messagesContainer" styleClass="messages-container">
+                        <!-- Wrapper for Date separator -->
+                        <VBox alignment="CENTER" styleClass="date-separator">
+                            <Label styleClass="date-text" text="Aujourd'hui" />
+                        </VBox>
+                        <!-- Messages dynamically added here -->
+                    </VBox>
+                </ScrollPane>
+                
+                <!-- Saisie -->
+                <HBox alignment="CENTER" spacing="15" styleClass="input-area">
+                    <Button onAction="#attachFile" styleClass="icon-btn" text="📎" />
+                    <Button onAction="#showEmojiPicker" styleClass="icon-btn" text="😊" />
+                    
+                    <HBox alignment="CENTER_LEFT" styleClass="message-input-wrapper" HBox.hgrow="ALWAYS">
+                        <TextField fx:id="messageInput" onAction="#sendMessage" promptText="Tapez votre message..." styleClass="message-input" HBox.hgrow="ALWAYS" />
+                    </HBox>
+                    
+                    <Button fx:id="sendButton" onAction="#sendMessage" styleClass="send-btn" text="➤" />
                 </HBox>
-                <Button fx:id="sendButton" text="Envoyer" styleClass="send-btn" onAction="#sendMessage"/>
-            </HBox>
-        </VBox>
-    </HBox>
+            </VBox>
+
+            <!-- COLONNE 3 : Panneau Info Contact -->
+            <VBox fx:id="contactInfoPanel" managed="false" minWidth="280" prefWidth="280" styleClass="contact-info-panel" visible="false">
+                <VBox alignment="CENTER" spacing="10" styleClass="contact-info-top">
+                    <StackPane>
+                        <Circle fx:id="infoPanelPic" radius="45" styleClass="profile-pic-large" />
+                        <Circle radius="10" styleClass="online-status-large" StackPane.alignment="BOTTOM_RIGHT">
+                            <StackPane.margin><Insets bottom="6" right="6" /></StackPane.margin>
+                        </Circle>
+                    </StackPane>
+                    <Label fx:id="infoPanelName" styleClass="info-name-large" text="Nom du Contact" />
+                    <HBox alignment="CENTER" spacing="5">
+                        <Circle radius="4" styleClass="online-status-small" />
+                        <Label fx:id="infoPanelStatus" styleClass="info-status" text="En ligne" />
+                    </HBox>
+                </VBox>
+                
+                <!-- Stats -->
+                <HBox alignment="CENTER" styleClass="stats-container">
+                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label fx:id="infoPanelMsgCount" styleClass="stat-number" text="0" />
+                        <Label styleClass="stat-label" text="Messages" />
+                    </VBox>
+                    <Region styleClass="vertical-divider" />
+                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label fx:id="infoPanelMediaCount" styleClass="stat-number" text="0" />
+                        <Label styleClass="stat-label" text="Médias" />
+                    </VBox>
+                    <Region styleClass="vertical-divider" />
+                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label fx:id="infoPanelGroupCount" styleClass="stat-number" text="0" />
+                        <Label styleClass="stat-label" text="Groupes" />
+                    </VBox>
+                </HBox>
+                
+                <Separator styleClass="custom-separator" />
+                
+                <Separator styleClass="custom-separator" />
+                
+                <VBox spacing="10" styleClass="media-gallery-container" VBox.vgrow="ALWAYS">
+                    <Label styleClass="info-section-title" text="Médias partagés" />
+                    <FlowPane fx:id="mediaGallery" hgap="8" styleClass="media-gallery" vgap="8">
+                        <!-- Les médias seront ajoutés dynamiquement -->
+                    </FlowPane>
+                </VBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</HBox>
 </VBox>
