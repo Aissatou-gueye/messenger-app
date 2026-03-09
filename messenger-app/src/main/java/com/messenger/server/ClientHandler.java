@@ -27,13 +27,13 @@ public class ClientHandler implements Runnable {
     // Utilitaires pour l'accès à la base de données (JPA/Hibernate)
     private final UserUtil userUtil;
     private final MessageUtil messageUtil;
-    private final com.messenger.util.GroupUtil groupUtil;
+
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
         this.userUtil = new UserUtil();
         this.messageUtil = new MessageUtil();
-        this.groupUtil = new com.messenger.util.GroupUtil();
+
 
         try {
             // Initialisation des flux de communication
@@ -97,9 +97,7 @@ public class ClientHandler implements Runnable {
                 case "GET_ALL_HISTORY":
                     handleGetAllHistory();
                     break;
-                case "CREATE_GROUP":
-                    handleCreateGroup(parts[1], parts[2]);
-                    break;
+
                 case "CALL":
                     handleCall(parts[1], parts[2]);
                     break;
@@ -342,7 +340,7 @@ public class ClientHandler implements Runnable {
 
                 // Récupère l'aperçu du dernier message pour l'affichage dans la liste
                 Message last = messageUtil.findLastMessage(currentUserObj, u);
-                String lastMsg = "Pas de message";
+                String lastMsg = "";
                 String time = "";
                 if (last != null) {
                     lastMsg = (last.getSender().getUsername().equals(currentUsername) ? "Moi: " : "")
@@ -374,30 +372,7 @@ public class ClientHandler implements Runnable {
                 "CALL_INCOMING:" + type + ":" + currentUsername);
     }
 
-    /**
-     * Crée un groupe de discussion et notifie les membres (RG5).
-     */
-    private void handleCreateGroup(String groupName, String members) {
-        Group group = new Group(groupName);
-        String[] memberList = members.split(",");
-        java.util.Set<User> memberSet = new java.util.HashSet<>();
 
-        for (String memberName : memberList) {
-            User u = userUtil.findByUsername(memberName);
-            if (u != null)
-                memberSet.add(u);
-        }
-
-        group.setMembers(memberSet);
-        groupUtil.save(group);
-
-        // Notifie chaque membre de la création du groupe
-        for (String member : memberList) {
-            UserConnectionManager.getInstance().sendMessageToUser(
-                    member,
-                    "GROUP_CREATED:" + groupName + ":" + members);
-        }
-    }
 
     /**
      * Renvoie l'historique complet entre deux utilisateurs (RG8).

@@ -39,26 +39,7 @@ public class MainController {
     @FXML
     private Button sendButton;
     @FXML
-    private VBox contactInfoPanel;
-    @FXML
-    private Label infoPanelName;
-    @FXML
-    private Label infoPanelStatus;
-    @FXML
-    private Label infoPanelEmail;
-    @FXML
-    private javafx.scene.shape.Circle infoPanelPic;
-    @FXML
-    private FlowPane mediaGallery;
-    @FXML
     private javafx.scene.shape.Circle myProfilePicCircle;
-
-    @FXML
-    private Label infoPanelMsgCount;
-    @FXML
-    private Label infoPanelMediaCount;
-    @FXML
-    private Label infoPanelGroupCount;
 
     private User currentUser;
     private User selectedUser;
@@ -69,7 +50,7 @@ public class MainController {
     private java.util.Map<String, String> profilePictures = new java.util.HashMap<>();
     private java.util.Map<String, LocalDateTime> messageTimes = new java.util.HashMap<>();
     private java.util.Map<String, LocalDateTime> logoutTimes = new java.util.HashMap<>();
-    private List<Group> groups = new ArrayList<>();
+
     private String currentFilter = "ALL"; // ALL, UNREAD, GROUPS
 
     /**
@@ -125,8 +106,6 @@ public class MainController {
                         .sendMessage("GET_HISTORY:" + selectedUser.getUsername());
 
                 openConversationLocally(); // Prépare l'affichage du chat
-                contactInfoPanel.setVisible(false);
-                contactInfoPanel.setManaged(false);
             }
         });
     }
@@ -214,29 +193,6 @@ public class MainController {
 
                     box.getChildren().addAll(picStack, info, spacer, rightSide);
                     setGraphic(box);
-                } else if (item instanceof Group) {
-                    Group group = (Group) item;
-                    setDisable(false);
-                    HBox box = new HBox(12);
-                    box.setPadding(new Insets(8, 12, 8, 12));
-                    box.setAlignment(Pos.CENTER_LEFT);
-
-                    StackPane picStack = new StackPane();
-                    javafx.scene.shape.Circle pic = new javafx.scene.shape.Circle(22);
-                    pic.setFill(javafx.scene.paint.Color.web("#10B981"));
-                    Label groupIcon = new Label("👥");
-                    groupIcon.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
-                    picStack.getChildren().addAll(pic, groupIcon);
-
-                    VBox info = new VBox(2);
-                    Label nameLbl = new Label(group.getName());
-                    nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1E293B;");
-                    Label membersLbl = new Label("Discussion de groupe");
-                    membersLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748B;");
-                    info.getChildren().addAll(nameLbl, membersLbl);
-
-                    setGraphic(box);
-                    box.getChildren().addAll(picStack, info);
                 }
             }
         });
@@ -244,41 +200,13 @@ public class MainController {
         conversationsList.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
             if (newVal instanceof User) {
                 selectedUser = (User) newVal;
-                // groupSelected = null;
                 unreadCounts.put(selectedUser.getUsername(), 0);
                 conversationsList.refresh();
                 openConversationLocally();
                 com.messenger.client.SessionManager.getInstance().getClientSocket()
                         .sendMessage("GET_HISTORY:" + selectedUser.getUsername());
-            } else if (newVal instanceof Group) {
-                // handleGroupSelection((Group) newVal);
             }
         });
-    }
-
-    private void initGroups() {
-        // Simulation d'un groupe avec "Tous les utilisateurs"
-        Group global = new Group("Tous les utilisateurs");
-        groups.add(global);
-    }
-
-    @FXML
-    private void attachFile() {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Sélectionner un fichier");
-        fileChooser.getExtensionFilters().addAll(
-                new javafx.stage.FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.gif"),
-                new javafx.stage.FileChooser.ExtensionFilter("Documents PDF", "*.pdf"),
-                new javafx.stage.FileChooser.ExtensionFilter("Tous les fichiers", "*.*"));
-
-        java.io.File file = fileChooser.showOpenDialog(messagesScrollPane.getScene().getWindow());
-        if (file != null) {
-            String type = file.getName().toLowerCase().endsWith(".pdf") ? "Fichier" : "Image";
-            String content = "[" + type + " : " + file.getName() + "]";
-            // On l'envoie comme un message spécial
-            messageInput.setText(content);
-            sendMessage(); // Assuming sendMessage() exists and handles sending the messageInput content
-        }
     }
 
     @FXML
@@ -290,15 +218,6 @@ public class MainController {
     @FXML
     private void filterUnread() {
         currentFilter = "UNREAD";
-        sortAndRefreshUsers();
-    }
-
-    @FXML
-    private void filterGroups() {
-        currentFilter = "GROUPS";
-        if (groups.isEmpty()) {
-            initGroups();
-        }
         sortAndRefreshUsers();
     }
 
@@ -384,32 +303,22 @@ public class MainController {
                         conversationsList.refresh();
                     }
                     break;
-                case "GROUP_CREATED":
-                    if (parts.length >= 2)
-                        handleGroupCreated(parts[0], parts[1]);
-                    break;
-            }
-        });
-    }
 
-    private void handleGroupCreated(String groupName, String members) {
-        javafx.application.Platform.runLater(() -> {
-            Group group = new Group(groupName);
-            if (!groups.stream().anyMatch(g -> g.getName().equals(groupName))) {
-                groups.add(group);
-                sortAndRefreshUsers();
             }
-            new Alert(Alert.AlertType.INFORMATION, "Vous avez été ajouté au groupe : " + groupName).show();
         });
     }
 
     private void updateProfileDisplay(String b64) {
+        if (b64 == null || b64.isEmpty()) {
+            activeChatPic.setFill(javafx.scene.paint.Color.web("#E2E8F0"));
+            return;
+        }
         try {
             javafx.scene.image.Image img = new javafx.scene.image.Image(
                     new java.io.ByteArrayInputStream(java.util.Base64.getDecoder().decode(b64)));
             activeChatPic.setFill(new javafx.scene.paint.ImagePattern(img));
-            infoPanelPic.setFill(new javafx.scene.paint.ImagePattern(img));
         } catch (Exception e) {
+            activeChatPic.setFill(javafx.scene.paint.Color.web("#E2E8F0"));
         }
     }
 
@@ -510,61 +419,10 @@ public class MainController {
                     items.add("NON LUS (" + unreadUsers.size() + ")");
                     items.addAll(unreadUsers);
                 }
-            } else if (currentFilter.equals("GROUPS")) {
-                List<Group> matchingGroups = new ArrayList<>();
-                for (Group g : groups) {
-                    if (g.getName().toLowerCase().contains(search)) {
-                        matchingGroups.add(g);
-                    }
-                }
-                if (!matchingGroups.isEmpty()) {
-                    items.add("GROUPES (" + matchingGroups.size() + ")");
-                    items.addAll(matchingGroups);
-                }
             }
 
             if (conversationsList != null) {
                 conversationsList.getItems().setAll(items);
-            }
-        });
-    }
-
-    @FXML
-    private void createGroup(javafx.event.ActionEvent event) {
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
-
-        TextField groupNameField = new TextField();
-        groupNameField.setPromptText("Nom du groupe");
-
-        ListView<String> userSelection = new ListView<>();
-        userSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        for (User u : users) {
-            userSelection.getItems().add(u.getUsername());
-        }
-
-        content.getChildren().addAll(new Label("Nom du groupe :"), groupNameField,
-                new Label("Sélectionner les membres :"), userSelection);
-
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Nouveau Groupe");
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                String groupName = groupNameField.getText().trim();
-                List<String> members = userSelection.getSelectionModel().getSelectedItems();
-                if (!groupName.isEmpty() && !members.isEmpty()) {
-                    Group group = new Group(groupName);
-                    groups.add(group);
-                    sortAndRefreshUsers();
-
-                    com.messenger.client.SessionManager.getInstance().getClientSocket()
-                            .sendMessage("CREATE_GROUP:" + groupName + ":" + String.join(",", members));
-
-                    new Alert(Alert.AlertType.INFORMATION, "Groupe '" + groupName + "' créé !").show();
-                }
             }
         });
     }
@@ -823,14 +681,6 @@ public class MainController {
         messageBox.setPadding(new Insets(5));
         messageBox.setSpacing(10);
 
-        // Mettre à jour la galerie de médias si c'est une image ou un fichier
-        if (selectedUser != null && (message.getSender().getUsername().equals(selectedUser.getUsername()) ||
-                message.getReceiver().getUsername().equals(selectedUser.getUsername()))) {
-            if (message.getContent().contains("[Image") || message.getContent().contains("[Fichier")) {
-                updateMediaGallery(message);
-            }
-        }
-
         ContextMenu msgMenu = new ContextMenu();
         MenuItem deleteItem = new MenuItem("Supprimer");
         MenuItem favItem = new MenuItem("Ajouter aux favoris");
@@ -904,19 +754,6 @@ public class MainController {
         messagesContainer.getChildren().add(messageBox);
     }
 
-    private void updateMediaGallery(Message message) {
-        javafx.application.Platform.runLater(() -> {
-            Label mediaIcon = new Label(message.getContent().contains("[Image") ? "🖼" : "📄");
-            mediaIcon.setStyle(
-                    "-fx-background-color: #E2E8F0; -fx-padding: 10; -fx-background-radius: 5; -fx-font-size: 18px;");
-            mediaIcon.setTooltip(new Tooltip(message.getContent()));
-            mediaGallery.getChildren().add(0, mediaIcon);
-            if (mediaGallery.getChildren().size() > 6) {
-                mediaGallery.getChildren().remove(6);
-            }
-        });
-    }
-
     private void scrollToBottom() {
         javafx.application.Platform.runLater(() -> messagesScrollPane.setVvalue(1.0));
     }
@@ -966,75 +803,22 @@ public class MainController {
         Label title = new Label("Paramètres du Profil");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
-        TextField nameField = new TextField(currentUser.getUsername());
-        nameField.setPromptText("Pseudo");
-        nameField.setStyle("-fx-background-radius: 10; -fx-padding: 8;");
-
         Button changePicBtn = new Button("Changer Photo de Profil");
         changePicBtn.setStyle("-fx-background-color: #3AB09E; -fx-text-fill: white; -fx-background-radius: 10;");
         changePicBtn.setMaxWidth(Double.MAX_VALUE);
 
-        settingsContent.getChildren().addAll(title, new Label("Nom d'utilisateur:"), nameField, changePicBtn);
+        settingsContent.getChildren().addAll(title, changePicBtn);
 
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Paramètres");
         dialog.getDialogPane().setContent(settingsContent);
 
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButtonType = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, cancelButtonType);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType);
 
         changePicBtn.setOnAction(e -> changeProfilePicture(null));
 
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == okButtonType) {
-                if (!nameField.getText().trim().isEmpty()) {
-                    currentUser.setUsername(nameField.getText().trim());
-                    // Notifier le serveur si besoin
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void toggleContactInfo() {
-        if (selectedUser == null)
-            return;
-        boolean visible = !contactInfoPanel.isVisible();
-        contactInfoPanel.setVisible(visible);
-        contactInfoPanel.setManaged(visible);
-        if (visible) {
-            infoPanelName.setText(selectedUser.getUsername());
-
-            if (selectedUser.getStatus() == User.Status.ONLINE) {
-                infoPanelStatus.setText("En ligne");
-                infoPanelStatus.setStyle("-fx-text-fill: #10B981;");
-            } else {
-                LocalDateTime logoutTime = logoutTimes.get(selectedUser.getUsername());
-                if (logoutTime != null) {
-                    infoPanelStatus.setText("Déconnecté à " + logoutTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-                } else {
-                    infoPanelStatus.setText("Hors ligne");
-                }
-                infoPanelStatus.setStyle("-fx-text-fill: #94A3B8;");
-            }
-
-            // Calculer les vrais nombres
-            long msgCount = messages.stream()
-                    .filter(m -> m.getSender().getUsername().equals(selectedUser.getUsername()) ||
-                            m.getReceiver().getUsername().equals(selectedUser.getUsername()))
-                    .count();
-
-            long mediaCount = messages.stream()
-                    .filter(m -> m.getSender().getUsername().equals(selectedUser.getUsername()) ||
-                            m.getReceiver().getUsername().equals(selectedUser.getUsername()))
-                    .filter(m -> m.getContent().contains("[Image") || m.getContent().contains("[Fichier"))
-                    .count();
-
-            infoPanelMsgCount.setText(String.valueOf(msgCount));
-            infoPanelMediaCount.setText(String.valueOf(mediaCount));
-            infoPanelGroupCount.setText(String.valueOf(groups.size()));
-        }
+        dialog.showAndWait();
     }
 
     @FXML
@@ -1048,11 +832,6 @@ public class MainController {
             emojiMenu.getItems().add(item);
         }
         emojiMenu.show((Button) event.getSource(), javafx.geometry.Side.TOP, 0, 0);
-    }
-
-    @FXML
-    private void newConversation(javafx.event.ActionEvent event) {
-        com.messenger.client.SessionManager.getInstance().getClientSocket().sendMessage("GET_ALL_USERS:");
     }
 
     @FXML
@@ -1087,24 +866,12 @@ public class MainController {
 
     @FXML
     private void voiceCall(javafx.event.ActionEvent event) {
-        if (selectedUser == null) {
-            showNoUserAlert();
-            return;
-        }
-        com.messenger.client.SessionManager.getInstance().getClientSocket()
-                .sendMessage("CALL:VOICE:" + selectedUser.getUsername());
-        new Alert(Alert.AlertType.INFORMATION, "Appel vocal vers " + selectedUser.getUsername()).show();
+        // Design seulement
     }
 
     @FXML
     private void videoCall(javafx.event.ActionEvent event) {
-        if (selectedUser == null) {
-            showNoUserAlert();
-            return;
-        }
-        com.messenger.client.SessionManager.getInstance().getClientSocket()
-                .sendMessage("CALL:VIDEO:" + selectedUser.getUsername());
-        new Alert(Alert.AlertType.INFORMATION, "Appel vidéo vers " + selectedUser.getUsername()).show();
+        // Design seulement
     }
 
     @FXML

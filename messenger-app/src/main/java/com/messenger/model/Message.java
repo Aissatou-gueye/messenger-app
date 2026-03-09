@@ -25,10 +25,7 @@ public class Message {
     @JoinColumn(name = "receiver_id", nullable = true)
     private User receiver;
 
-    // Groupe destinataire (Optionnel, si le message est envoyé dans un groupe)
-    @ManyToOne
-    @JoinColumn(name = "group_id", nullable = true)
-    private Group group;
+
 
     // Contenu textuel du message (RG7: Max 1000 caractères)
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -103,13 +100,7 @@ public class Message {
         this.receiver = receiver;
     }
 
-    public Group getGroup() {
-        return group;
-    }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
 
     public String getContent() {
         return content;

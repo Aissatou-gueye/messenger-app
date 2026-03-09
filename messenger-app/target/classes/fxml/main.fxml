@@ -60,8 +60,7 @@
                 </HBox>
             </VBox>
             <Button onAction="#showSettings" styleClass="icon-btn-small" text="⚙" />
-            <Button onAction="#newConversation" styleClass="icon-btn-small" text="➕" />
-            <Button onAction="#createGroup" styleClass="icon-btn-small" text="👥+" />
+
         </HBox>
         
         <!-- Barre de Recherche -->
@@ -75,7 +74,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Button maxWidth="Infinity" onAction="#filterAll" styleClass="filter-btn, filter-btn-active" text="Tous" HBox.hgrow="ALWAYS" />
                 <Button maxWidth="Infinity" onAction="#filterUnread" styleClass="filter-btn" text="Non lus" HBox.hgrow="ALWAYS" />
-                <Button maxWidth="Infinity" onAction="#filterGroups" styleClass="filter-btn" text="Groupes" HBox.hgrow="ALWAYS" />
+
             </HBox>
         </VBox>
         
@@ -104,7 +103,7 @@
                 <Button styleClass="icon-btn-active" text="💬" />
                 <Button onAction="#voiceCall" styleClass="icon-btn-top" text="📞" />
                 <Button onAction="#videoCall" styleClass="icon-btn-top" text="📹" />
-                <Button onAction="#toggleContactInfo" styleClass="icon-btn-top" text="⋮" />
+
             </HBox>
         </HBox>
         
@@ -135,50 +134,7 @@
             </VBox>
 
             <!-- COLONNE 3 : Panneau Info Contact -->
-            <VBox fx:id="contactInfoPanel" managed="false" minWidth="280" prefWidth="280" styleClass="contact-info-panel" visible="false">
-                <VBox alignment="CENTER" spacing="10" styleClass="contact-info-top">
-                    <StackPane>
-                        <Circle fx:id="infoPanelPic" radius="45" styleClass="profile-pic-large" />
-                        <Circle radius="10" styleClass="online-status-large" StackPane.alignment="BOTTOM_RIGHT">
-                            <StackPane.margin><Insets bottom="6" right="6" /></StackPane.margin>
-                        </Circle>
-                    </StackPane>
-                    <Label fx:id="infoPanelName" styleClass="info-name-large" text="Nom du Contact" />
-                    <HBox alignment="CENTER" spacing="5">
-                        <Circle radius="4" styleClass="online-status-small" />
-                        <Label fx:id="infoPanelStatus" styleClass="info-status" text="En ligne" />
-                    </HBox>
-                </VBox>
-                
-                <!-- Stats -->
-                <HBox alignment="CENTER" styleClass="stats-container">
-                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                        <Label fx:id="infoPanelMsgCount" styleClass="stat-number" text="0" />
-                        <Label styleClass="stat-label" text="Messages" />
-                    </VBox>
-                    <Region styleClass="vertical-divider" />
-                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                        <Label fx:id="infoPanelMediaCount" styleClass="stat-number" text="0" />
-                        <Label styleClass="stat-label" text="Médias" />
-                    </VBox>
-                    <Region styleClass="vertical-divider" />
-                    <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                        <Label fx:id="infoPanelGroupCount" styleClass="stat-number" text="0" />
-                        <Label styleClass="stat-label" text="Groupes" />
-                    </VBox>
-                </HBox>
-                
-                <Separator styleClass="custom-separator" />
-                
-                <Separator styleClass="custom-separator" />
-                
-                <VBox spacing="10" styleClass="media-gallery-container" VBox.vgrow="ALWAYS">
-                    <Label styleClass="info-section-title" text="Médias partagés" />
-                    <FlowPane fx:id="mediaGallery" hgap="8" styleClass="media-gallery" vgap="8">
-                        <!-- Les médias seront ajoutés dynamiquement -->
-                    </FlowPane>
-                </VBox>
-            </VBox>
+
         </HBox>
     </VBox>
 </HBox>

@@ -13,7 +13,7 @@ public class SessionManager {
 
     private SessionManager() {
         // Initialisation du socket sur l'IP locale et le port 5000 (RG11)
-        clientSocket = new ClientSocket("127.0.0.1", 5000);
+        clientSocket = new ClientSocket("192.168.1.15", 5000);
     }
 
     /**

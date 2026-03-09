@@ -30,6 +30,5 @@
         <!-- Entités -->
         <mapping class="com.messenger.model.User"/>
         <mapping class="com.messenger.model.Message"/>
-        <mapping class="com.messenger.model.Group"/>
     </session-factory>
 </hibernate-configuration>
